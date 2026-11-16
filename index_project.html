@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Born or Built?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a "pitch deck you can read" — fixed top bar with page menu, one page in view at a time, prev/next at the foot. */
+:root{
+  --bg:#f7f8f6; --surface:#ffffff; --fg:#14211b; --muted:#53635b; --line:#dbe2dd;
+  --green:#00543c; --green-soft:#e3efe9; --gold:#fdbb30; --gold-ink:#7a5300; --on-green:#ffffff;
+  --display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1714; --surface:#15211c; --fg:#e6eee9; --muted:#9fb1a7; --line:#27362f;
+  --green:#3fb68b; --green-soft:#183026; --gold:#fdbb30; --gold-ink:#fdcf6a; --on-green:#06130e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1714; --surface:#15211c; --fg:#e6eee9; --muted:#9fb1a7; --line:#27362f;
+  --green:#3fb68b; --green-soft:#183026; --gold:#fdbb30; --gold-ink:#fdcf6a; --on-green:#06130e; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+img{max-width:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.6}
+a{color:var(--green);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-999px}.skip:focus{left:16px;top:16px;z-index:50;background:var(--surface);padding:8px 12px}
+
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--fg);text-decoration:none;white-space:nowrap}
+.brand span{color:var(--green)}
+.menu-btn{margin-left:auto;font:600 .9rem var(--body);background:var(--green);color:var(--on-green);border:0;border-radius:999px;padding:8px 16px;cursor:pointer}
+nav.pages{display:none;border-top:1px solid var(--line)}
+nav.pages.open{display:block}
+nav.pages ol{list-style:none;margin:0 auto;max-width:1100px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px;
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav.pages a{display:flex;gap:10px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--fg);font-size:.95rem}
+nav.pages a:hover{background:var(--green-soft)}
+nav.pages a[aria-current="page"]{background:var(--green);color:var(--on-green)}
+nav.pages .n{font-family:var(--mono);opacity:.7;font-variant-numeric:tabular-nums}
+
+main{max-width:1100px;margin:0 auto;padding-block:40px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.page{display:grid;gap:28px}
+.eyebrow{font:500 .8rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.4rem,7vw,4.6rem);letter-spacing:-.02em}
+h2{font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.015em}
+h3{font-size:1.3rem}
+p{margin:0;max-width:65ch}
+.lede{font-size:1.2rem;color:var(--muted);max-width:60ch}
+.cite{font:400 .82rem var(--mono);color:var(--muted)}
+.two{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:center}
+.two>*{min-width:0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:10px;align-content:start;min-width:0}
+.card.green{background:var(--green);color:var(--on-green);border-color:transparent}
+.card.green .cite{color:inherit;opacity:.8}
+.stack{display:grid;gap:14px}
+figure{margin:0}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:8px}
+svg text{font-family:var(--display)}
+.big{font-family:var(--display);font-weight:700;font-size:clamp(4rem,12vw,7rem);line-height:.9;color:var(--green)}
+.stamp{display:inline-block;font-family:var(--display);font-weight:700;font-size:2.4rem;letter-spacing:.12em;color:#c0392b;border:4px solid #c0392b;padding:4px 18px;transform:rotate(-6deg);border-radius:6px}
+blockquote{margin:0;font-family:var(--display);font-size:clamp(1.4rem,3vw,2rem);line-height:1.25;font-weight:600;border-left:6px solid var(--gold);padding-left:20px;text-wrap:balance}
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;counter-reset:s}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--green);border-radius:10px;padding:14px;display:grid;gap:4px}
+.steps li::before{content:"Step " counter(s);font:500 .75rem var(--mono);color:var(--gold-ink);text-transform:uppercase;letter-spacing:.06em}
+.steps b{font-family:var(--display);font-size:1.15rem}
+.deck{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;list-style:none;padding:0;margin:0}
+.deck li{aspect-ratio:16/9;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;font-size:.85rem;color:var(--muted)}
+.deck b{font-family:var(--display);font-size:1.05rem;color:var(--fg)}
+dl.gloss{display:grid;grid-template-columns:max-content 1fr;gap:8px 16px;margin:0}
+dl.gloss dt{font-weight:600;font-family:var(--mono);font-size:.9rem;color:var(--green)}
+dl.gloss dd{margin:0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.compare ul{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.chips li{background:var(--green-soft);color:var(--fg);border-radius:999px;padding:6px 14px;font-size:.92rem;font-weight:500}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+summary{cursor:pointer;font-weight:600}
+details .qa{display:grid;gap:14px;margin-top:14px}
+details .qa p b{display:block;font-family:var(--display)}
+.mike-video{display:block;width:100%;max-width:100%;max-height:70vh;border-radius:12px;background:#000}
+#mikeVideo details{background:transparent;border:0;padding:0}
+.refs{display:grid;gap:12px;padding-left:2em;text-indent:-2em;font-size:.95rem}
+.refs p{max-width:none;overflow-wrap:anywhere}
+.links{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.links a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--fg)}
+.links a:hover{border-color:var(--green)}
+.links b{color:var(--green);display:block}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1d1600;font-weight:600;border-radius:999px;padding:12px 22px;text-decoration:none;justify-self:start}
+
+footer.pager{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-top:1px solid var(--line)}
+footer.pager a{text-decoration:none;font-weight:600;max-width:45%}
+footer.pager .count{font-family:var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.credit{text-align:center;font-size:.8rem;color:var(--muted);padding-bottom:24px}
+
+@media (max-width:760px){
+  .two,.grid3,.grid2,.compare{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .deck{grid-template-columns:1fr 1fr}
+  body{font-size:16px}
+}
+@media (prefers-reduced-motion:no-preference){.page{animation:in .35s ease-out}@keyframes in{from{transform:translateY(8px)}to{transform:none}}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#content">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="#intro">Born <span>or</span> Built?</a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="pageNav">All pages</button>
+  </div>
+  <nav class="pages" id="pageNav" aria-label="Site pages"><ol id="navList"></ol></nav>
+</header>
+
+<main id="content" tabindex="-1">
+
+<!-- 1 -->
+<section class="page" id="intro" data-title="Introduction">
+  <div class="two">
+    <div class="stack">
+      <p class="eyebrow">Entrepreneurship &amp; Innovation · University of San Francisco</p>
+      <h1>Picture an entrepreneur.</h1>
+      <p class="lede">Did you picture a 20-year-old in a hoodie who dropped out of college with one genius idea? Most people do. Research says that picture is mostly wrong, and that is good news if you are still choosing a major.</p>
+      <p>This site walks through USF's Entrepreneurship &amp; Innovation (E&amp;I) major and makes one argument: <strong>entrepreneurs are built, not born.</strong> It is a set of skills you can learn, and those skills pay off whether or not you ever start a company.</p>
+      <a class="cta" href="#major">Start the tour →</a>
+      <p class="cite">By Mike Chezan &amp; Yuvraj · RHET 120 Digital Showcase</p>
+    </div>
+    <figure>
+      <svg viewBox="0 0 400 320" role="img" aria-labelledby="t1">
+        <title id="t1">Illustration: a lightbulb labeled "born" is crossed out, and a stack of blocks labeled skills, practice and experience builds upward instead.</title>
+        <rect x="0" y="0" width="400" height="320" rx="18" fill="var(--green-soft)"/>
+        <g transform="translate(60 60)">
+          <circle cx="50" cy="60" r="44" fill="var(--surface)" stroke="var(--muted)" stroke-width="4"/>
+          <rect x="34" y="104" width="32" height="22" rx="4" fill="var(--muted)"/>
+          <text x="50" y="66" text-anchor="middle" font-size="18" font-weight="700" fill="var(--muted)">born</text>
+          <line x1="0" y1="10" x2="100" y2="130" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(210 70)">
+          <rect x="0" y="150" width="140" height="44" rx="8" fill="var(--green)"/>
+          <text x="70" y="178" text-anchor="middle" font-size="17" font-weight="700" fill="var(--on-green)">experience</text>
+          <rect x="12" y="100" width="116" height="44" rx="8" fill="var(--green)" opacity=".85"/>
+          <text x="70" y="128" text-anchor="middle" font-size="17" font-weight="700" fill="var(--on-green)">practice</text>
+          <rect x="24" y="50" width="92" height="44" rx="8" fill="var(--gold)"/>
+          <text x="70" y="78" text-anchor="middle" font-size="17" font-weight="700" fill="#1d1600">skills</text>
+          <path d="M70 0 L90 34 L50 34 Z" fill="var(--gold)"/>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="page" id="major" data-title="What Is This Major?" hidden>
+  <p class="eyebrow">Page 2</p>
+  <h2>What is Entrepreneurship &amp; Innovation?</h2>
+  <p class="lede">E&amp;I is the study of how new value gets created: how people spot a problem, design a solution, test it, and turn it into something that lasts.</p>
+  <div class="two">
+    <div class="stack">
+      <p>At USF, E&amp;I is a Bachelor of Science in Business Administration (BSBA) in the School of Management. Its curriculum "emphasizes creative and analytical thinking in the development of socially responsible ventures" (USF School of Management, n.d.-b).</p>
+      <p>Students learn to identify problems, design products and services, plan a venture's finances and marketing, and pitch their ideas to real investors.</p>
+    </div>
+    <div class="card">
+      <h3>Central questions the field asks</h3>
+      <ul class="stack" style="margin:0;padding-left:1.1em">
+        <li>What problem is worth solving, and who has it?</li>
+        <li>How can we test a solution cheaply before betting on it?</li>
+        <li>How do we create value for customers and society, not only profit?</li>
+        <li>How do we turn an idea into an organization that lasts?</li>
+      </ul>
+    </div>
+  </div>
+  <ol class="steps" aria-label="The entrepreneurial process">
+    <li><b>Problem</b><span>Find a real need shared by many people.</span></li>
+    <li><b>Idea</b><span>Design a solution that is different from what exists.</span></li>
+    <li><b>Test</b><span>Interview customers, prototype, collect evidence.</span></li>
+    <li><b>Launch</b><span>Build, pitch, and grow the venture.</span></li>
+  </ol>
+</section>
+
+<!-- 3 -->
+<section class="page" id="why" data-title="Why Does It Matter?" hidden>
+  <p class="eyebrow">Page 3</p>
+  <h2>Why does it matter today?</h2>
+  <p class="lede">New ventures are how ideas become products, jobs, and solutions to public problems, from health tech to climate tools.</p>
+  <div class="two">
+    <div class="card green">
+      <p class="eyebrow" style="color:var(--gold)">Case study</p>
+      <p class="big" style="color:var(--gold)">$100K</p>
+      <h3>Silvaye: wildfire risk from space</h3>
+      <p>USF students Owen Sordillo and Andrew Saah, an E&amp;I major, co-founded Silvaye, a startup that uses NASA technology, satellite data, and ground sensors to assess wildfire risk. The project earned a $100,000 grant from a NASA challenge.</p>
+      <p class="cite">(Breen, 2025)</p>
+    </div>
+    <div class="stack">
+      <p>Silvaye shows what makes the field relevant: entrepreneurs take tools that already exist and point them at a problem that affects whole communities.</p>
+      <p>That focus on impact is built into USF's program, which centers on <em>socially responsible</em> ventures (USF School of Management, n.d.-b).</p>
+      <p>Professor June Y. Lee adds that AI makes building a product easier than ever, so the skill that matters most is "identifying meaningful problems and creating solutions that people actually want" (J. Y. Lee, personal communication, November 12, 2026).</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="page" id="myth" data-title="Common Misconceptions" hidden>
+  <p class="eyebrow">Page 4</p>
+  <h2>The misconception</h2>
+  <div class="two">
+    <div class="stack">
+      <span class="stamp" aria-hidden="true">MYTH</span>
+      <blockquote>"You're either a born entrepreneur or you're not, and you need a totally original, world-changing idea."</blockquote>
+    </div>
+    <div class="stack">
+      <p>This idea is everywhere: movies about tech founders, pitch shows on TV, legends about college dropouts. If it were true, studying entrepreneurship would be pointless. You either have "it" or you don't.</p>
+      <p>Professor Lee hears a version of this from students all the time. "Many students think they need a groundbreaking or completely original idea," she says. "In reality, successful entrepreneurship often involves improving existing products, services, or business models" (J. Y. Lee, personal communication, November 12, 2026).</p>
+      <p>So is the myth true? Researchers have tested it. The next page shows what they found.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="page" id="research" data-title="What Does Research Reveal?" hidden>
+  <p class="eyebrow">Page 5</p>
+  <h2>What does research reveal?</h2>
+  <p class="lede">Two well-known studies take the "born entrepreneur" myth apart.</p>
+  <div class="grid2">
+    <div class="card">
+      <p class="eyebrow">Gartner, 1988</p>
+      <h3>It's behavior, not personality</h3>
+      <p>Entrepreneurship scholar William Gartner reviewed decades of studies that tried to find a special "entrepreneur personality." They found no consistent traits that separated entrepreneurs from other business owners. Gartner argued that entrepreneurs should be defined by what they <em>do</em>, which is creating organizations, rather than who they are.</p>
+      <p><strong>Why it matters:</strong> behaviors can be learned and practiced.</p>
+      <p class="cite">(Gartner, 1988)</p>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Azoulay et al., 2020</p>
+      <h3>Experience beats youth</h3>
+      <div style="display:flex;align-items:end;gap:14px;flex-wrap:wrap"><span class="big">45</span><span style="padding-bottom:10px;color:var(--muted)">average founder age</span></div>
+      <p>Using U.S. Census Bureau data, these economists found that the average founder of the fastest-growing 1-in-1,000 new U.S. companies was 45 years old. Prior experience in the same industry strongly predicted success.</p>
+      <p class="cite">(Azoulay et al., 2020)</p>
+    </div>
+  </div>
+  <div class="card green">
+    <p><strong>What this means for you:</strong> entrepreneurship is a skill set you build over time through practice and experience. That is exactly what a college major is designed to do.</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="page" id="discourse" data-title="Inside the Discourse Community" hidden>
+  <p class="eyebrow">Page 6</p>
+  <h2>Inside the discourse community: the pitch</h2>
+  <p class="lede">Every field has its own way of sharing knowledge. For entrepreneurs, the signature genre is the pitch.</p>
+  <div class="two">
+    <div class="stack">
+      <p>In a few minutes, a founder has to define a problem, show evidence, explain a business model, and ask for support. Investors and judges respond with questions that test the evidence. This back-and-forth is how the community decides which ideas deserve resources.</p>
+      <p><strong>Our artifact:</strong> USF News's article on the 2026 Innovation Showcase. More than 50 students from across campus submitted ideas, 50 industry professionals reviewed them, and six finalists pitched to a panel of entrepreneurs and investors. Winners received grants of $1,000 to $4,000 (Elliot, 2026).</p>
+      <p>The article shows the community's values. Each pitch is summarized by the <em>problem it solves</em> and <em>who it helps</em>, ideas are sorted into "Idea" and "Impact" stages, and success is measured in funding. Professor Lee describes the same standard: a strong pitch shows "evidence, not just enthusiasm" (J. Y. Lee, personal communication, November 12, 2026).</p>
+    </div>
+    <div class="stack">
+      <h3>Anatomy of a pitch deck</h3>
+      <ol class="deck" aria-label="The six standard slides of a pitch deck">
+        <li><b>Problem</b>Who hurts, and how much?</li>
+        <li><b>Solution</b>What you built</li>
+        <li><b>Market</b>How many people need it</li>
+        <li><b>Business model</b>How it makes money</li>
+        <li><b>Team</b>Why you can do it</li>
+        <li><b>Ask</b>What you need</li>
+      </ol>
+      <div class="card">
+        <h3>Speak the language</h3>
+        <dl class="gloss">
+          <dt>MVP</dt><dd>Minimum viable product: the simplest version you can test with real users.</dd>
+          <dt>Proof of concept</dt><dd>Evidence that the idea actually works.</dd>
+          <dt>Traction</dt><dd>Early signs of demand, like users, sales, or sign-ups.</dd>
+          <dt>Angel funding</dt><dd>Early money from individual investors.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="page" id="voices" data-title="Voices from the Field" hidden>
+  <p class="eyebrow">Page 7 · Expert interview</p>
+  <h2>Voices from the field</h2>
+  <div class="two">
+    <div class="stack">
+      <blockquote>"You don't have to be born an entrepreneur. You develop entrepreneurial thinking by practicing it."</blockquote>
+      <blockquote>"You don't need to start your own company to be entrepreneurial."</blockquote>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Our expert</p>
+      <h3>June Y. Lee, Ph.D.</h3>
+      <p>Associate Professor in Entrepreneurship &amp; Innovation and Faculty Director of the CityRise Business Initiative, USF School of Management.</p>
+      <p>We emailed Professor Lee four questions, and she answered in writing on November 12, 2026. She agreed to let us share her answers here with her name and title.</p>
+      <p class="cite">(J. Y. Lee, personal communication, November 12, 2026)</p>
+    </div>
+  </div>
+  <div class="card" id="mikeVideo">
+    <p class="eyebrow">Mike's perspective · student response</p>
+    <h3>Responding to Professor Lee</h3>
+    <video class="mike-video" controls preload="metadata" playsinline poster="poster.jpg" aria-describedby="mikeNote">
+      <source src="mike-response.mp4" type="video/mp4">
+      Your browser can't play this video. Read the transcript below instead.
+    </video>
+    <p class="cite" id="mikeNote">Video, 2 min. Mike shares his personal opinion based on his own experience; it is not a research finding. A transcript is below.</p>
+    <details>
+      <summary>Read the transcript</summary>
+      <div class="qa">
+        <p>Hi, I'm Mike Chezan, a first-year business student at USF.</p>
+        <p>In an email interview, Professor June Lee told us, "You don't have to be born an entrepreneur. You develop entrepreneurial thinking by practicing it." That stood out to me, because I grew up in a family of entrepreneurs.</p>
+        <p>Watching them, I learned that success has less to do with where you start. Anyone can begin as an entrepreneur. In my experience, the ones who succeed are the ones who stay consistent through the process and remain committed to their idea, even when it gets difficult.</p>
+        <p>The research supports this too. A 2020 study by economist Pierre Azoulay and his colleagues found that the average founder of the fastest-growing new companies in the U.S. was 45 years old (Azoulay et al., 2020). So you don't need to have everything figured out at eighteen.</p>
+        <p>Professor Lee makes a similar point: execution and adaptability matter just as much as the idea itself.</p>
+        <p>So if you're undecided about your major, don't wait until you feel like a "natural." Start practicing, and stay with it.</p>
+      </div>
+    </details>
+  </div>
+  <details>
+    <summary>Read highlights from the full interview</summary>
+    <div class="qa">
+      <p><b>What do students misunderstand about entrepreneurship?</b>"Entrepreneurship is not just about starting a company. It is about identifying problems, recognizing opportunities, and creating value through innovative solutions."</p>
+      <p><b>Can entrepreneurial skills be learned?</b>"Entrepreneurship is a mindset and a set of skills that can be developed through education and experience." It is "best learned through hands-on experiences: developing ideas, interviewing potential customers, testing assumptions, and learning from failures."</p>
+      <p><b>What makes a pitch persuasive?</b>"The most compelling business ideas address a meaningful problem experienced by a clearly defined group of customers." She adds: "In the AI era, simply saying your product uses AI is not enough."</p>
+      <p><b>Why study it if you never start a company?</b>"As AI takes over more routine tasks, human skills such as creativity, critical thinking, problem-solving, adaptability, and leadership become even more important."</p>
+    </div>
+  </details>
+</section>
+
+<!-- 8 -->
+<section class="page" id="usf" data-title="Studying This Major at USF" hidden>
+  <p class="eyebrow">Page 8</p>
+  <h2>Studying E&amp;I at USF</h2>
+  <p class="lede">Professor Lee says USF's E&amp;I courses "emphasize experiential learning, real-world projects, and collaboration with entrepreneurs and businesses" (J. Y. Lee, personal communication, November 12, 2026). Here is what that looks like.</p>
+  <div class="grid3">
+    <div class="card">
+      <h3>Incubator + microgrants</h3>
+      <p>Students from any major can join the E&amp;I incubator, enter pitch competitions, get mentoring from professional entrepreneurs, and apply for microgrants. One student used a microgrant to build a medical-device prototype that led to $100,000 in angel funding.</p>
+      <p class="cite">(Breen, 2025)</p>
+    </div>
+    <div class="card">
+      <h3>Gellert Family Business Center</h3>
+      <p>Connects students with Bay Area family businesses through coursework and internships, with a focus on next-generation leadership.</p>
+      <p class="cite">(USF School of Management, n.d.-a)</p>
+    </div>
+    <div class="card">
+      <h3>The San Francisco advantage</h3>
+      <p>USF's library dean, who co-leads the E&amp;I initiative, describes USF as "the only university in San Francisco with an E&amp;I initiative," right next to Silicon Valley.</p>
+      <p class="cite">(Breen, 2025)</p>
+    </div>
+  </div>
+  <div class="card green">
+    <p><strong>Flexible paths:</strong> students can explore E&amp;I through individual courses, a minor, or the full major (J. Y. Lee, personal communication, November 12, 2026).</p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="page" id="skills" data-title="Skills and Opportunities" hidden>
+  <p class="eyebrow">Page 9</p>
+  <h2>Skills and opportunities</h2>
+  <div class="two">
+    <div class="stack">
+      <h3>Transferable skills</h3>
+      <ul class="chips">
+        <li>Problem-solving</li><li>Pitching &amp; persuasion</li><li>Customer research</li><li>Collaboration</li><li>Financial planning</li><li>Creativity</li><li>Resilience</li>
+      </ul>
+      <h3>Career paths</h3>
+      <p>Professor Lee notes that E&amp;I graduates pursue careers in product management, project management, business development, growth, strategy, operations, and consulting. You can also be an <strong>intrapreneur</strong>, someone who drives innovation inside an existing company (J. Y. Lee, personal communication, November 12, 2026).</p>
+      <p>USF lists alumni working at companies including Adobe, Google, Tesla, Oracle, and Uber, in roles from co-founder to product manager (USF School of Management, n.d.-c).</p>
+    </div>
+    <div class="card green" style="text-align:center">
+      <p class="big" style="color:var(--gold)">#17</p>
+      <h3>in Entrepreneurship</h3>
+      <p>USF's School of Management ranks No. 17 in Entrepreneurship in the U.S. News &amp; World Report rankings.</p>
+      <p class="cite">(University of San Francisco, n.d.)</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="page" id="perspective" data-title="A New Perspective" hidden>
+  <p class="eyebrow">Page 10</p>
+  <h2>A new perspective</h2>
+  <p class="lede">We are both business students, and we expected this project to confirm what we already knew. Instead, we learned much more about what it takes to succeed as a business graduate, in entrepreneurship and in every other field.</p>
+  <div class="compare">
+    <div class="card">
+      <h3>What we thought</h3>
+      <ul>
+        <li>Entrepreneurs are born with a special personality.</li>
+        <li>You have to start young to succeed.</li>
+        <li>You need one genius, never-seen-before idea.</li>
+        <li>The major only matters if you plan to found a startup.</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>What we found</h3>
+      <ul>
+        <li>Entrepreneurship is a learnable set of behaviors (Gartner, 1988).</li>
+        <li>Experience predicts success, and top founders average 45 (Azoulay et al., 2020).</li>
+        <li>Improving existing products counts (J. Y. Lee, personal communication, November 12, 2026).</li>
+        <li>The skills work inside any company, nonprofit, or family business.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <p class="eyebrow">Our biggest surprise</p>
+    <div style="display:flex;align-items:end;gap:14px;flex-wrap:wrap"><span class="big">45</span><span style="padding-bottom:10px;color:var(--muted)">average age of the most successful founders</span></div>
+    <p>The fact that surprised us most was the average age of founders behind the fastest-growing new U.S. companies: 45 (Azoulay et al., 2020). We had assumed success belonged to people who figured everything out by their early twenties. Learning that experience matters more than youth changed how we see our own futures: there is no deadline for having it all figured out.</p>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="page" id="consider" data-title="Why Consider This Major?" hidden>
+  <p class="eyebrow">Page 11</p>
+  <h2>Why consider this major?</h2>
+  <div class="grid3">
+    <div class="card">
+      <p class="eyebrow">Reason one</p>
+      <h3>You can learn it</h3>
+      <p>Entrepreneurship is defined by behavior, not inborn traits, so a major can teach it (Gartner, 1988).</p>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Reason two</p>
+      <h3>You practice for real</h3>
+      <p>Pitch competitions, an incubator, and microgrants let you test ideas with real investors while still a student (Breen, 2025; Elliot, 2026).</p>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Reason three</p>
+      <h3>It pays off anywhere</h3>
+      <p>As AI handles routine work, creativity and problem-solving matter more in every career (J. Y. Lee, personal communication, November 12, 2026).</p>
+    </div>
+  </div>
+  <div class="card green">
+    <p style="font-family:var(--display);font-size:1.4rem;font-weight:600;max-width:none">Entrepreneurs are built, not born. USF is a place to build.</p>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="page" id="explore" data-title="Explore Further" hidden>
+  <p class="eyebrow">Page 12</p>
+  <h2>Explore further</h2>
+  <p class="lede">Have an idea, or just curious? Here is where to start.</p>
+  <ul class="links">
+    <li><a href="https://www.usfca.edu/management/programs/undergraduate/entrepreneurship-innovation" target="_blank" rel="noopener"><b>USF Entrepreneurship &amp; Innovation major</b>Program overview, minor, faculty, and careers</a></li>
+    <li><a href="https://www.usfca.edu/news/entrepreneurship-for-life" target="_blank" rel="noopener"><b>Join the E&amp;I incubator and apply for microgrants</b>USF News article on the Entrepreneurship for Life initiative</a></li>
+    <li><a href="https://www.usfca.edu/news/innovation-showcase-2026" target="_blank" rel="noopener"><b>See the 2026 Innovation Showcase pitches</b>Student startups, judges, and winners</a></li>
+    <li><a href="https://www.usfca.edu/management/engagement-impact/gellert-family-business-center" target="_blank" rel="noopener"><b>Gellert Family Business Center</b>Family business courses and internships</a></li>
+  </ul>
+
+  <h3 style="margin-top:12px">References</h3>
+  <div class="refs">
+    <p>Azoulay, P., Jones, B. F., Kim, J. D., &amp; Miranda, J. (2020). Age and high-growth entrepreneurship. <em>American Economic Review: Insights, 2</em>(1), 65–82. https://doi.org/10.1257/aeri.20180582</p>
+    <p>Breen, A. (2025, February 5). <em>New initiative offers entrepreneurship to everybody</em>. University of San Francisco. https://www.usfca.edu/news/entrepreneurship-for-life</p>
+    <p>Elliot, E. (2026, May 1). <em>Students pitch business ideas to entrepreneurs</em>. University of San Francisco. https://www.usfca.edu/news/innovation-showcase-2026</p>
+    <p>Gartner, W. B. (1988). "Who is an entrepreneur?" is the wrong question. <em>American Journal of Small Business, 12</em>(4), 11–32. https://doi.org/10.1177/104225878801200401</p>
+    <p>University of San Francisco. (n.d.). <em>School of Management stands out in U.S. News rankings</em>. https://www.usfca.edu/news/school-management-stands-out-in-us-news-rankings</p>
+    <p>University of San Francisco School of Management. (n.d.-a). <em>Gellert Family Business Center</em>. https://www.usfca.edu/management/engagement-impact/gellert-family-business-center</p>
+    <p>University of San Francisco School of Management. (n.d.-b). <em>Program overview – Entrepreneurship and Innovation, BSBA</em>. https://www.usfca.edu/management/programs/undergraduate/entrepreneurship-innovation/program-overview</p>
+    <p>University of San Francisco School of Management. (n.d.-c). <em>Careers – Entrepreneurship and Innovation, BSBA</em>. https://www.usfca.edu/management/programs/undergraduate/entrepreneurship-innovation/careers</p>
+  </div>
+  <p class="cite">Interview: J. Y. Lee, personal communication, November 12, 2026 (cited in text only, per APA 7). Illustrations created by the authors.</p>
+</section>
+
+</main>
+
+<footer class="pager" aria-label="Page navigation">
+  <a id="prev" href="#intro">← Previous</a>
+  <span class="count" id="count">1 / 12</span>
+  <a id="next" href="#major">Next →</a>
+</footer>
+<p class="credit">Mike Chezan &amp; Yuvraj · RHET 120 · University of San Francisco · 2026</p>
+
+<script>
+(function(){
+  var pages=[].slice.call(document.querySelectorAll('.page'));
+  var ids=pages.map(function(p){return p.id});
+  var navList=document.getElementById('navList');
+  pages.forEach(function(p,i){
+    var li=document.createElement('li');
+    li.innerHTML='<a href="#'+p.id+'"><span class="n">'+(i+1<10?'0':'')+(i+1)+'</span>'+p.dataset.title+'</a>';
+    navList.appendChild(li);
+  });
+  var btn=document.getElementById('menuBtn'), nav=document.getElementById('pageNav');
+  btn.addEventListener('click',function(){var o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o);});
+  function show(){
+    var id=location.hash.slice(1); var i=ids.indexOf(id); if(i<0){i=0;id=ids[0];}
+    pages.forEach(function(p,j){p.hidden=j!==i});
+    navList.querySelectorAll('a').forEach(function(a,j){ if(j===i)a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+    var prev=document.getElementById('prev'), next=document.getElementById('next');
+    prev.style.visibility=i===0?'hidden':'visible'; next.style.visibility=i===ids.length-1?'hidden':'visible';
+    if(i>0){prev.href='#'+ids[i-1]; prev.textContent='← '+pages[i-1].dataset.title;}
+    if(i<ids.length-1){next.href='#'+ids[i+1]; next.textContent=pages[i+1].dataset.title+' →';}
+    document.getElementById('count').textContent=(i+1)+' / '+ids.length;
+    document.title=(i===0?'Born or Built?':pages[i].dataset.title+' · Born or Built?');
+    nav.classList.remove('open'); btn.setAttribute('aria-expanded','false');
+  }
+  window.addEventListener('hashchange',function(){show(); window.scrollTo(0,0); document.getElementById('content').focus({preventScroll:true});});
+  show();
+})();
+</script>
+
+</body>
+</html>
